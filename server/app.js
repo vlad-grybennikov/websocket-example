@@ -18,7 +18,7 @@ io.on('connection', (socket) => {
     })
 })
 
-app.use(express.static('build'));
+app.use(express.static('../build'));
 http.listen(PORT, () => {
     console.log(`Server is started on port №${PORT}`);
 });
