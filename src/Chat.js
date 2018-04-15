@@ -3,9 +3,12 @@ import PropTypes from "prop-types";
 import styled, {injectGlobal} from 'styled-components';
 import RenderIf from './general/RenderIf';
 import Chatting from "./Chatting";
-
+import socket from "socket.io-client";
 import store from "./store";
 import {Provider} from "react-redux";
+window.socket = socket('http://localhost:9999/', {
+    path: "/chat/"
+});
 
 injectGlobal`
     * {
@@ -44,13 +47,12 @@ const Cover = styled.div`
 
 
 export default class Chat extends Component {
-
     render() {
         return (
             <Provider store={store}>
                 <Cover>
                     Chat
-                    <Chatting/>
+                    <Chatting />
                 </Cover>
             </Provider>
         )

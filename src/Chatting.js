@@ -2,7 +2,6 @@ import React, {Component} from "react";
 import PropTypes from "prop-types";
 import styled from 'styled-components';
 import {TextInput, Button} from './ui';
-
 import {connect} from 'react-redux';
 import store from "./store";
 
@@ -99,6 +98,9 @@ class Chatting extends Component{
             this.setState({
                 messages: store.getState().messages
             }, this.scrollDown)
+        });
+        window.socket.on("new-message", (message) => {
+            this.props.getMessage(message)
         })
     }
 
@@ -115,8 +117,8 @@ class Chatting extends Component{
             message: this.state.message,
             image: this.state.image,
             sender: true
-
         });
+        window.socket.emit("message", this.state.message);
         this.setState({
             message: ''
         }, this.scrollDown)
@@ -177,6 +179,14 @@ const dispatchToProps = (dispatch) => {
                 sender,
                 image
             });
+        },
+        getMessage: (message) => {
+            dispatch({
+                type: "ADD_NEW_MESSAGE",
+                message,
+                image: '/img/bg-login.jpg',
+                sender: false
+            })
         }
     }
 };
