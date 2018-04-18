@@ -1,24 +1,31 @@
+const PORT = 9988;
 const express = require('express');
 const app = express();
-const http = require('http').Server(app);
-const io = require("socket.io")(http, {
+const server = require('http').Server(app);
+const io = require("socket.io")(server, {
     path: '/chat/',
+    origins: "*:*"
 });
 
-const PORT = 9999;
-
-io.on('connection', (socket) => {
+let online = 0;
+io.on('connection', (client) => {
     console.log("User connected");
-    socket.on("disconnect", () => {
-        console.log("disconnected");
+    console.log(++online);
+    client.broadcast.emit("change-online", online);
+    client.on("disconnect", () => {
+        console.log(--online);
+        client.broadcast.emit("change-online", online);
     });
-    socket.on("message", (message) => {
-        console.log(`message: ${message}`);
-        socket.broadcast.emit("new-message", message);
+    client.on("message", (message) => {
+        console.log(message);
+        client.broadcast.emit("new-message", message);
+    });
+    client.on("typing", (is) => {
+        client.broadcast.emit("somebody-typing", is);
     })
-})
+});
 
 app.use(express.static('../build'));
-http.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server is started on port №${PORT}`);
 });

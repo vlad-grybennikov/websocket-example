@@ -21,8 +21,12 @@ const Container = styled.div`
     width: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-end;
     overflow: auto;
+`;
+
+const Typing = styled.div`
+    color: #999;
 `;
 
 const MessageWrapper = styled.div`
@@ -90,7 +94,7 @@ class Chatting extends Component{
         name: 'Author',
         image: '/img/ava.png',
         message: '',
-        messages: this.props.messages
+        typing: false
     }
 
     componentDidMount(){
@@ -100,8 +104,19 @@ class Chatting extends Component{
             }, this.scrollDown)
         });
         window.socket.on("new-message", (message) => {
-            this.props.getMessage(message)
+            // this.props.getMessage(message);
+            this.props.addMessage({
+                message,
+                sender: false,
+                image: '/img/bg-login.jpg'
+            })
+        });
+        window.socket.on("somebody-typing", (is) => {
+            this.setState({
+                typing: is
+            })
         })
+
     }
 
     componentWillUnmount(){
@@ -135,7 +150,15 @@ class Chatting extends Component{
         map[e.charCode] = e.type == 'keydown';
         if(e.charCode === 13) {
             this.addMessage();
+            window.socket.emit("typing", false);
+        } else {
+            if(this.state.message.length > 0){
+                window.socket.emit("typing", true);
+            } else {
+                window.socket.emit("typing", false);
+            }
         }
+
 
     }
     render(){
@@ -151,6 +174,7 @@ class Chatting extends Component{
                     }
 
                 </MessageWrapper>
+                <Typing>{this.state.typing ? 'Somebody typing' : ''}</Typing>
                 <SendMessage>
                     <InputMessage value={this.state.message}
                                   onChange={this.changeMessage}
