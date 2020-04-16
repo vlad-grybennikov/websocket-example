@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const cors = require("cors");
 const http = require('http').Server(app);
 
 // ONLY HTTP SERVER!!!!
@@ -7,6 +8,8 @@ const http = require('http').Server(app);
 const io = require("socket.io")(http, {
     path: '/chat/',
 });
+
+app.use(cors());
 
 const PORT = 9999;
 let count = 0;
