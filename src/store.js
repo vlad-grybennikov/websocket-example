@@ -22,6 +22,12 @@ const store = createStore((state = initialState, action) => {
             })
         }
         //Reducer
+        case "SET_HISTORY": {
+            return {
+                ...state,
+                messages: action.history
+            };
+        }
 
         default: {
             return state;

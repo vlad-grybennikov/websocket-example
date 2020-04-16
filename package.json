@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "express": "^4.16.3",
+    "lodash": "^4.17.10",
     "prop-types": "^15.6.1",
     "react": "^16.3.1",
     "react-dom": "^16.3.1",
@@ -11,12 +12,14 @@
     "react-scripts": "1.1.4",
     "redux": "^3.7.2",
     "socket.io": "^2.1.0",
+    "socket.io-client": "^2.1.1",
     "styled-components": "^3.2.5"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "node ./server/app.js",
+    "build": "react-scripts build && mv build ./server",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
-  }
+  },
+  "proxy": "http://localhost:9999"
 }

@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import PropTypes from "prop-types";
 import styled from 'styled-components';
 import {TextInput, Button} from './ui';
+import socket from "socket.io-client";
 
 import {connect} from 'react-redux';
 import store from "./store";
@@ -99,6 +100,17 @@ class Chatting extends Component{
             this.setState({
                 messages: store.getState().messages
             }, this.scrollDown)
+        });
+        this.socketServer = socket("http://localhost:9999");
+        this.socketServer.on("send-history", (history) => {
+            this.props.setHistory(history);
+        })
+        this.socketServer.on("receive-message", (data) => {
+            this.props.addMessage({
+                message: data,
+                image: "/img/bg-login.jpg",
+                sender: false
+            });
         })
     }
 
@@ -115,11 +127,11 @@ class Chatting extends Component{
             message: this.state.message,
             image: this.state.image,
             sender: true
-
         });
+        this.socketServer.emit("send-message", this.state.message);
         this.setState({
             message: ''
-        }, this.scrollDown)
+        }, this.scrollDown);
     }
 
     changeMessage = (e) => {
@@ -177,6 +189,12 @@ const dispatchToProps = (dispatch) => {
                 sender,
                 image
             });
+        },
+        setHistory(history){
+            dispatch({
+                type: "SET_HISTORY",
+                history
+            })
         }
     }
 };
