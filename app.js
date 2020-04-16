@@ -1,42 +1,32 @@
 const express = require('express');
-const http = require('http');
-const socket = require("socket.io"); // socket.io
-const app = express(); // express
+const app = express();
+const http = require('http').Server(app);
 
-const PORT = process.env.PORT || 9999;
-
-app.use(express.static('build'));
-
-const server = http.Server(app); // http server
-const io = socket(server, {});
-
-const history = [{
-    message: 'Test message',
-    image: "/img/bg-login.jpg"
-}];
-
-let online = 0;
-io.on('connection', (client) => {
-    console.log(`New connection, online: ${++online}, ${client.id}`);
-
-    client.emit("send-history", history);
-
-    client.on("send-message", (message) => {
-        console.log(message);
-        history.push({
-            message,
-            image: "/img/bg-login.jpg"
-        })
-        client.broadcast.emit("receive-message", message);
-    })
-    client.on("disconnect", () => {
-        console.log(`User disconnected, online: ${--online}`);
-    })
+// ONLY HTTP SERVER!!!!
+// localhost:9999/chat
+const io = require("socket.io")(http, {
+    path: '/chat/',
 });
 
-server.listen(PORT, () => {
+const PORT = 9999;
+let count = 0;
+io.on('connection', (socket) => {
+    console.log("User connected");
+    console.log(++count);
+    socket.on("disconnect", () => {
+        --count;
+        console.log("disconnected");
+    });
+    socket.on("typing", () => {
+        socket.broadcast.emit("typing");
+    });
+    socket.on("message", (message) => {
+        console.log(`message: ${message}`);
+        socket.broadcast.emit("new-message", message);
+    })
+})
+
+app.use(express.static('../build'));
+http.listen(PORT, () => {
     console.log(`Server is started on port №${PORT}`);
 });
-
-
-
