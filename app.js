@@ -16,16 +16,20 @@ let count = 0;
 io.on('connection', (socket) => {
     console.log("User connected");
     console.log(++count);
+    socket.broadcast.emit("user-connected", count);
+    socket.emit("user-connected", count);
     socket.on("disconnect", () => {
-        --count;
+        console.log(--count);
         console.log("disconnected");
+        socket.broadcast.emit("user-disconnected", count);
     });
-    socket.on("typing", () => {
-        socket.broadcast.emit("typing");
+    socket.on("typing", (isTyping) => {
+        console.log(`TYPING: ${isTyping}`);
+        socket.broadcast.emit("typing", isTyping);
     });
-    socket.on("message", (message) => {
-        console.log(`message: ${message}`);
-        socket.broadcast.emit("new-message", message);
+    socket.on("message", ({message, name}) => {
+        console.log(`message: ${message} from: ${name}`);
+        socket.broadcast.emit("new-message", { message, name });
     })
 })
 
