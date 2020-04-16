@@ -16,10 +16,7 @@
     "styled-components": "^3.2.5"
   },
   "scripts": {
-    "start": "node ./server/app.js",
-    "build": "react-scripts build && mv build ./server",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "start": "node ./app.js"
   },
   "proxy": "http://localhost:9999"
 }
