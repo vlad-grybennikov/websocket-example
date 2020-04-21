@@ -45,10 +45,10 @@ app.use(bodyParser.json());
 app.post("/users", addUser, sendResponse);
 app.get("/users", getAllUsers, sendResponse);
 
-app.post("/tweets", addTweet, sendResponse, (req, res, next) => {
+app.post("/tweets", addTweet, (req, res, next) => {
     io.emit("new-tweet", res.data);
     next();
-});
+}, sendResponse);
 app.get("/tweets", getAllTweets, sendResponse);
 
 app.use((req, res, next) => {
